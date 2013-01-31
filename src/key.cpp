@@ -5,6 +5,7 @@
 // a string for the file ext and a colour
 
 FileKeyEntry::FileKeyEntry(const FXFont& font, const std::string& ext, const vec3& colour) {
+    this->drawCount = true;
     this->ext    = ext;
     this->colour = colour;
     this->pos_y  = -1.0f;
@@ -148,7 +149,8 @@ void FileKeyEntry::draw() {
     font.draw((int)pos.x+2, (int)pos.y+3,  display_ext.c_str());
 
     font.dropShadow(true);
-    font.print((int)pos.x+width+4, (int)pos.y+3, "%d", count);
+    if( drawCount )
+        font.print((int)pos.x+width+4, (int)pos.y+3, "%d", count);
 }
 
 // Key
@@ -209,6 +211,11 @@ void FileKey::clear() {
     interval_remaining = 0.0f;
 }
 
+FileKeyEntry* FileKey::createEntry(RFile* file) const
+{
+    return new FileKeyEntry(font, file->ext, file->getFileColour());
+}
+
 void FileKey::inc(RFile* file) {
 
     FileKeyEntry* entry = 0;
@@ -218,7 +225,7 @@ void FileKey::inc(RFile* file) {
     if(result != keymap.end()) {
         entry = result->second;
     } else {
-        entry = new FileKeyEntry(font, file->ext, file->getFileColour());
+        entry = createEntry(file);
         keymap[file->ext] = entry;
     }
 
@@ -248,6 +255,10 @@ bool file_key_entry_sort (const FileKeyEntry* a, const FileKeyEntry* b) {
     return a->getExt().compare(b->getExt()) < 0;
 }
 
+void FileKey::sort() {
+    std::sort(active_keys.begin(), active_keys.end(), file_key_entry_sort);
+}
+
 void FileKey::logic(float dt) {
 
     interval_remaining -= dt;
@@ -270,7 +281,7 @@ void FileKey::logic(float dt) {
             }
 
             //sort
-            std::sort(active_keys.begin(), active_keys.end(), file_key_entry_sort);
+            sort();
 
             //limit to entries we can put onto the screen
             int max_visible_entries = std::max(0, (int)((display.height - 150.0f) / 20.0f));

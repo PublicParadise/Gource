@@ -53,6 +53,7 @@
 #include "key.h"
 
 class Gource : public SDLApp {
+protected:
     std::string logfile;
 
     FrameExporter* frameExporter;
@@ -64,7 +65,8 @@ class Gource : public SDLApp {
     PositionSlider slider;
     ZoomCamera camera;
 
-    FileKey file_key;
+    FileKey* file_key;
+    FileKey ownFileKey;
 
     bool debug, trace_debug;
 
@@ -194,8 +196,6 @@ class Gource : public SDLApp {
 
     void setMessage(const char* str, ...);
 
-    void reset();
-
     RUser* addUser(const std::string& username);
     RFile* addFile(const RCommitFile& cf);
 
@@ -257,7 +257,7 @@ class Gource : public SDLApp {
 
     void changeColours();
 public:
-    Gource(FrameExporter* frameExporter = 0);
+    Gource( FrameExporter* frameExporter = 0, FileKey* file_key = 0);
     ~Gource();
 
     static void writeCustomLog(const std::string& logfile, const std::string& output_file);
@@ -287,6 +287,11 @@ public:
 #if SDL_VERSION_ATLEAST(1,3,0)
     void mouseWheel(SDL_MouseWheelEvent *e);
 #endif
+    
+    void reset();
+    inline void setRecolour(bool value) { recolour = value; }
+    inline bool hasFiles() const { return !files.empty(); }
+    inline void pause( bool on ) { paused = on; }
 };
 
 #endif

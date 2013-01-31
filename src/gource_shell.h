@@ -23,7 +23,7 @@
 #include "gource.h"
 
 class GourceShell : public SDLApp {
-
+protected:
     Gource* gource;
 
     bool shutdown;
@@ -38,23 +38,24 @@ class GourceShell : public SDLApp {
 
     Gource* getNext();
     void blendLastFrame(float dt);
+    virtual Gource* createGource(FrameExporter* exporter);
 public:
     GourceShell(ConfFile* conf, FrameExporter* exporter);
-    ~GourceShell();
+    virtual ~GourceShell();
 
-    void update(float t, float dt);
+    virtual void update(float t, float dt);
 
-    void resize(int width, int height);
+    virtual void resize(int width, int height);
 
-    void toggleFullscreen();
+    virtual void toggleFullscreen();
     
-    void quit();
+    virtual void quit();
         
-    void keyPress(SDL_KeyboardEvent *e);
-    void mouseMove(SDL_MouseMotionEvent *e);
-    void mouseClick(SDL_MouseButtonEvent *e);
+    virtual void keyPress(SDL_KeyboardEvent *e);
+    virtual void mouseMove(SDL_MouseMotionEvent *e);
+    virtual void mouseClick(SDL_MouseButtonEvent *e);
 #if SDL_VERSION_ATLEAST(1,3,0)
-    void mouseWheel(SDL_MouseWheelEvent *e);
+    virtual void mouseWheel(SDL_MouseWheelEvent *e);
 #endif
 };
 

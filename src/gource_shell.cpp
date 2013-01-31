@@ -194,7 +194,7 @@ Gource* GourceShell::getNext() {
     // replace gource
 
     Gource* gource_tmp = gource;
-        gource = new Gource(exporter);
+        gource = createGource(exporter);
     delete gource_tmp;
 
     next = false;
@@ -261,4 +261,9 @@ void GourceShell::update(float t, float dt) {
         transition_interval = 1.0f;
         next = false;
     }
+}
+
+Gource* GourceShell::createGource(FrameExporter* exporter)
+{
+    return new Gource(exporter);
 }

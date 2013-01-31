@@ -23,7 +23,9 @@ int   gGourceMaxQuadTreeDepth = 6;
 
 int gGourceUserInnerLoops = 0;
 
-Gource::Gource(FrameExporter* exporter) {
+Gource::Gource(FrameExporter* exporter, FileKey* key)
+:ownFileKey(1.0f)
+{
 
     this->logfile = gGourceSettings.path;
     commitlog = 0;
@@ -116,7 +118,10 @@ Gource::Gource(FrameExporter* exporter) {
     textbox.setBrightness(0.5f);
     textbox.show();
 
-    file_key = FileKey(1.0f);
+    if( key )
+        file_key = key;
+    else
+        file_key = &ownFileKey;
 
     camera = ZoomCamera(vec3(0,0, -300), vec3(0.0, 0.0, 0.0), gGourceSettings.camera_zoom_default, gGourceSettings.camera_zoom_max);
     camera.setPadding(gGourceSettings.padding);
@@ -195,7 +200,7 @@ Gource::~Gource() {
     if(root!=0)      delete root;
 
     //reset settings
-    gGourceSettings.setGourceDefaults();
+    //gGourceSettings.setGourceDefaults();
 }
 
 void Gource::init() {
@@ -895,7 +900,7 @@ void Gource::reset() {
 
     files.clear();
 
-    file_key.clear();
+    file_key->clear();
 
     idle_time=0;
     currtime=0;
@@ -927,7 +932,7 @@ void Gource::deleteFile(RFile* file) {
 
     files.erase(file->fullpath);
     tagfilemap.erase(file->getTagID());
-    file_key.dec(file);
+    file_key->dec(file);
 
     //debugLog("removed file %s\n", file->fullpath.c_str());
 
@@ -956,7 +961,7 @@ RFile* Gource::addFile(const RCommitFile& cf) {
 
     root->addFile(file);
 
-    file_key.inc(file);
+    file_key->inc(file);
 
     while(root->getParent() != 0) {
         debugLog("parent changed to %s", root->getPath().c_str());
@@ -1444,7 +1449,7 @@ void Gource::changeColours() {
         it->second->colourize();
     }
 
-    file_key.colourize();
+    file_key->colourize();
 }
 
 void Gource::logic(float t, float dt) {
@@ -1488,7 +1493,7 @@ void Gource::logic(float t, float dt) {
         }
     }
 
-    file_key.logic(dt);
+    file_key->logic(dt);
 
     slider.logic(dt);
 
@@ -2425,8 +2430,8 @@ void Gource::draw(float t, float dt) {
     }
 
     //file key
-    file_key.draw();
-    file_key.setShow(gGourceSettings.show_key);
+    file_key->draw();
+    file_key->setShow(gGourceSettings.show_key);
 
     //slider
     if(canSeek()) {

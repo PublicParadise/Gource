@@ -16,6 +16,7 @@
 */
 
 #include "gource_settings.h"
+#include "core/sdlapp.h"
 
 GourceSettings gGourceSettings;
 

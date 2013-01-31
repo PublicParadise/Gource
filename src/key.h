@@ -27,7 +27,8 @@
 #include <vector>
 #include <algorithm>
 
-class FileKeyEntry {   
+class FileKeyEntry {
+protected:
     FXFont font;
     vec3 colour;
     std::string ext;
@@ -45,6 +46,7 @@ class FileKeyEntry {
     vec2 pos;
     vec2 shadow;
     bool show;
+    bool drawCount;
 public:
     FileKeyEntry(const FXFont& font, const std::string& ext, const vec3& colour);
 
@@ -72,6 +74,7 @@ public:
 };
 
 class FileKey {
+protected:
     std::vector<FileKeyEntry*> active_keys;
     std::map<std::string, FileKeyEntry*> keymap;
 
@@ -79,23 +82,25 @@ class FileKey {
     float update_interval;
     float interval_remaining;
     bool show;
+    virtual FileKeyEntry* createEntry(RFile* file) const;
+    virtual void sort();
 public:
     FileKey();
-    ~FileKey();
+    virtual ~FileKey();
     FileKey(float update_interval);
     
-    void setShow(bool show);
+    virtual void setShow(bool show);
     
-    void clear();
+    virtual void clear();
 
-    void colourize();
+    virtual void colourize();
     
-    void inc(RFile* file);
-    void dec(RFile* file);
+    virtual void inc(RFile* file);
+    virtual void dec(RFile* file);
 
-    void logic(float dt);
+    virtual void logic(float dt);
     
-    void draw();
+    virtual void draw();
 };
 
 #endif
